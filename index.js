@@ -12,7 +12,9 @@ var app = express();
 var PORT = 8000;
 var mongoose = require('mongoose');
 var router = express.Router();
-var date = require('date-fns');
+var colors = require('colors');
+var oneLinerJoke = require('one-liner-joke');
+var operations = require("./modules");
 
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
@@ -68,6 +70,21 @@ app.get('/', function(req, res, next) {
             }
         });
 
+        // THESE ARE USEFUL NPM PACKAGES OK
+        console.log('hello'.green); // outputs green text
+        console.log('i like cake and pies'.underline.red) // outputs red underlined text
+        console.log('inverse the color'.inverse); // inverses the color
+        console.log('OMG Rainbows!'.rainbow); // rainbow
+        console.log('Run the trap'.trap); // Drops the bass
+
+        /*
+        The variable getRandomJoke will contain a random joke with a format:
+        {"body":"Artificial intelligence is no match for natural stupidity.","tags":["intelligence","stupid"]}
+        */
+        var getRandomJoke = oneLinerJoke.getRandomJoke();
+        console.log(getRandomJoke)
+        console.log(operations["test"]() + "")
+
         //render handlebars
         res.render('home', { 
             title: "ALBUMS", 
@@ -81,12 +98,17 @@ app.get('/', function(req, res, next) {
 app.get("/album/:album_name", function(req, res) {
 
     Album.findOne({ title: req.params.album_name }, function(err, album) {
-        if (err) throw err;   
+        if (err) throw err;
+        var average = null;
 
         console.log(album);
+        if (album != null) {
+            average = operations["average"](album);
+        }
 
 		res.render('album', {
-        album: album
+        album: album,
+        average : average
         });
     });
 });
@@ -352,7 +374,7 @@ app.get('/post/:slug', function(req, res) {
           API
 ****************************/
 
-app.post('/add_album', function(req,res) {
+app.post('/api/add_album', function(req,res) {
     var album = new Album({
         artist: req.body.artist,
         title: req.body.title,
@@ -364,12 +386,11 @@ app.post('/add_album', function(req,res) {
 
     album.save(function(err) {
         if (err) throw err;
-        res.redirect('/album/dfad')
         return res.send('Succesfully inserted album.');
     });  
 })
 
-app.get('/album', function(req,res) {
+app.get('/api/album', function(req,res) {
     Album.find({}, function(err, albums) {
         if (err) throw err;
         res.send(albums);
@@ -377,7 +398,7 @@ app.get('/album', function(req,res) {
 })
 
 // add review to a specific album
-app.post('/album/:id/review', function(req,res) {
+app.post('/api/album/:id/review', function(req,res) {
     Album.findOne({ _id: req.params.id }, function(err, album) {
         if (err) throw err;
         if (!album) return res.send('No album found with that ID.');
@@ -397,7 +418,7 @@ app.post('/album/:id/review', function(req,res) {
 });
 
 // get all the reviews for a specific album
-app.get('/album/:id/reviews', function(req,res) {
+app.get('/api/album/:id/reviews', function(req,res) {
     Album.findOne({ _id: req.params.id }, function(err, album) {
         if (err) throw err;
         if (!album) return res.send('No album found with that ID.');
@@ -406,7 +427,7 @@ app.get('/album/:id/reviews', function(req,res) {
 });
 
 // delete an album
-app.delete('/album/:id', function(req,res) {
+app.delete('/api/album/:id', function(req,res) {
     Album.findByIdAndRemove(req.params.id, function(err, album) {
         if (err) throw err;
         if (!album) {
@@ -416,6 +437,33 @@ app.delete('/album/:id', function(req,res) {
     });
 })
 
+app.delete('/api/delete_album/:album', function(req,res) {
+    Album.remove({ title: req.params.album}, function(err, album) {
+        if (err) throw err;
+        if (!album) {
+            return res.send('No album found with given ID');
+        }
+        res.send('Album deleted!')
+    })
+    
+})
+
+// delete a review posted by a person based on title of review
+// app.delete('/review/:author/:title', function(req,res) {
+//     var title = req.params.title;
+//     var author = req.params.author;
+//     Album.findOne({title: req.body.album}, function(err, album) {
+//         if (err) {
+//             throw err
+//         }
+//     })
+//         _.each(album.reviews, function(i, index) {
+//             if (i.author == author && i.title == title) {
+//                 album.
+//             }
+//         })
+            
+// })
 /****************************
             RUN
 ****************************/
