@@ -1,4 +1,4 @@
-#Musicality
+# Musicality
 
 ---
 
@@ -9,6 +9,8 @@ Date: 12/06/19
 Project Topic: Album Reviews
 
 URL: https://musicality389.herokuapp.com/
+
+GitHub URL: https://github.com/thechuster/CMSC389KFinalProject 
 
 ---
 
@@ -113,7 +115,7 @@ DELETE endpoint routes:
 
 Modules
 1. average -> takes the average of the ratings
-2. 
+2. test -> to test the functionality of the website
 
 ### 6. NPM Packages
 1. colors
